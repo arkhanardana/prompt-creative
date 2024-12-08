@@ -27,8 +27,8 @@ export default function MyProfile() {
 				name="My"
 				desc="Welcome to your personalized profile"
 				data={posts}
-				handleDelete={() => {}}
-				handleEdit={() => {}}
+				handleDelete={handleDelete}
+				handleEdit={handleEdit}
 			/>
 		</>
 	);
