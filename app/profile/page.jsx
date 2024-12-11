@@ -17,7 +17,7 @@ export default function MyProfile() {
 		};
 
 		if (session?.user.id) fetchPosts();
-	}, []);
+	}, [session?.user.id]);
 
 	const handleEdit = (post) => {
 		push(`/update-prompt?id=${post._id}`);
@@ -28,13 +28,16 @@ export default function MyProfile() {
 
 		if (hasConfirmed) {
 			try {
-				await fetch(`/api/prompt/${post._id.toString()}`, {
+				const response = await fetch(`/api/prompt/${post._id.toString()}`, {
 					method: "DELETE",
 				});
 
-				const filteredPosts = posts.filter((item) => item._id !== post._id);
-
-				setPosts(filteredPosts);
+				if (response.ok) {
+					const filteredPosts = posts.filter((item) => item._id !== post._id);
+					setPosts(filteredPosts);
+				} else {
+					console.log("Error to fetch");
+				}
 			} catch (error) {
 				console.log(error);
 			}
