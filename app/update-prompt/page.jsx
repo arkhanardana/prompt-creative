@@ -1,55 +1,12 @@
-"use client";
+import { Suspense } from "react";
+import UpdatePrompt from "@/components/UpdatePrompt";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Form from "@components/Form";
-
-const UpdatePrompt = () => {
-	const router = useRouter();
-	const { query } = router;
-	const promptId = query.id;
-
-	const [submitting, setSubmitting] = useState(false);
-	const [post, setPost] = useState({
-		prompt: "",
-		tag: "",
-	});
-
-	useEffect(() => {
-		const getPromptDetails = async () => {
-			if (!promptId) return;
-			const response = await fetch(`/api/prompt/${promptId}`);
-			const data = await response.json();
-			setPost({
-				prompt: data.prompt,
-				tag: data.tag,
-			});
-		};
-		getPromptDetails();
-	}, [promptId]);
-
-	const updatePrompt = async (e) => {
-		e.preventDefault();
-		setSubmitting(true);
-
-		if (!promptId) return alert("Prompt not found");
-
-		try {
-			const response = await fetch(`/api/prompt/${promptId}`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(post),
-			});
-
-			if (response.ok) router.push("/");
-		} catch (error) {
-			console.error(error);
-		} finally {
-			setSubmitting(false);
-		}
-	};
-
-	return <Form type="Edit" post={post} setPost={setPost} submitting={submitting} handleSubmit={updatePrompt} />;
+const Page = () => {
+	return (
+		<Suspense fallback={<div>Loading Update Prompt...</div>}>
+			<UpdatePrompt />
+		</Suspense>
+	);
 };
 
-export default UpdatePrompt;
+export default Page;
