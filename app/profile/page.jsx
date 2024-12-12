@@ -49,8 +49,8 @@ export default function MyProfile() {
 				name="My"
 				desc="Welcome to your personalized profile"
 				data={posts}
-				handleDelete={handleDelete}
 				handleEdit={handleEdit}
+				handleDelete={handleDelete}
 			/>
 		</>
 	);
