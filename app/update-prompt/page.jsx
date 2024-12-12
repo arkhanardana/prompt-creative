@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Form from "@components/Form";
 
 const UpdatePrompt = () => {
 	const router = useRouter();
-	const searchParams = useSearchParams();
-	const promptId = searchParams.get("id");
+	const { query } = router;
+	const promptId = query.id;
 
 	const [submitting, setSubmitting] = useState(false);
 	const [post, setPost] = useState({
@@ -17,6 +17,7 @@ const UpdatePrompt = () => {
 
 	useEffect(() => {
 		const getPromptDetails = async () => {
+			if (!promptId) return;
 			const response = await fetch(`/api/prompt/${promptId}`);
 			const data = await response.json();
 			setPost({
@@ -24,7 +25,7 @@ const UpdatePrompt = () => {
 				tag: data.tag,
 			});
 		};
-		if (promptId) getPromptDetails();
+		getPromptDetails();
 	}, [promptId]);
 
 	const updatePrompt = async (e) => {
@@ -32,18 +33,15 @@ const UpdatePrompt = () => {
 		setSubmitting(true);
 
 		if (!promptId) return alert("Prompt not found");
+
 		try {
 			const response = await fetch(`/api/prompt/${promptId}`, {
 				method: "PATCH",
-				body: JSON.stringify({
-					prompt: post.prompt,
-					tag: post.tag,
-				}),
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(post),
 			});
 
-			if (response.ok) {
-				router.push("/");
-			}
+			if (response.ok) router.push("/");
 		} catch (error) {
 			console.error(error);
 		} finally {
@@ -51,17 +49,7 @@ const UpdatePrompt = () => {
 		}
 	};
 
-	return (
-		<>
-			<Form type="Edit" post={post} setPost={setPost} submitting={submitting} handleSubmit={updatePrompt} />
-		</>
-	);
+	return <Form type="Edit" post={post} setPost={setPost} submitting={submitting} handleSubmit={updatePrompt} />;
 };
 
-export function UpdatePromptPage() {
-	return (
-		<Suspense fallback={<div>Loading...</div>}>
-			<UpdatePrompt />
-		</Suspense>
-	);
-}
+export default UpdatePrompt;
